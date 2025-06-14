@@ -311,11 +311,11 @@
                     
                     // پیدا کردن اولین فایل .conf
                     const confFile = files.find(file => file.name.endsWith('.conf'));
-                    const confUrl = confFile ? `https://raw.githubusercontent.com/BasirParvizi/F/main/${confFile.name}` : null;
+                    const confUrl = confFile ? `https://raw.githubusercontent.com/BasirParvizi/WG/main/${confFile.name}` : null;
 
                     // پیدا کردن اولین فایل .jpg
                     const jpgFile = files.find(file => file.name.endsWith('.jpg'));
-                    const jpgUrl = jpgFile ? `https://raw.githubusercontent.com/BasirParvizi/F/main/${jpgFile.name}` : null;
+                    const jpgUrl = jpgFile ? `https://raw.githubusercontent.com/BasirParvizi/WG/main/${jpgFile.name}` : null;
 
                     return { confUrl, jpgUrl };
                 } catch (error) {
