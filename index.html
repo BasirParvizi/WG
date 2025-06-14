@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#e74c3c">
     <title>WireGuard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -206,7 +207,7 @@
     <div class="container">
         <div class="logo-container">
             <img 
-                src="https://raw.githubusercontent.com/BasirParvizi/files/main/logo.jpg" 
+                src="https://raw.githubusercontent.com/BasirParvizi/F/main/logo.jpg" 
                 alt="WireGuard Logo" 
                 class="logo" 
                 id="wireguard-logo"
@@ -244,7 +245,7 @@
                 <i class="fas fa-file-download"></i>
                 Download Config
             </a>
-            <a href="https://raw.githubusercontent.com/BasirParvizi/files/main/photo_2025-06-14_16-47-22.jpg" class="action-btn" id="qr-code">
+            <a href="#" class="action-btn" id="qr-code">
                 <i class="fas fa-qrcode"></i>
                 QR Code
             </a>
@@ -301,23 +302,69 @@
                 });
             }
 
-            // دانلود APK 2 با نام اصلی
+            // تابع برای دریافت فایل‌های مخزن از GitHub
+            async function fetchRepositoryFiles() {
+                const repoUrl = 'https://api.github.com/repos/BasirParvizi/F/contents/';
+                try {
+                    const response = await fetch(repoUrl);
+                    const files = await response.json();
+                    
+                    // پیدا کردن اولین فایل .conf
+                    const confFile = files.find(file => file.name.endsWith('.conf'));
+                    const confUrl = confFile ? `https://raw.githubusercontent.com/BasirParvizi/F/main/${confFile.name}` : null;
+
+                    // پیدا کردن اولین فایل .jpg
+                    const jpgFile = files.find(file => file.name.endsWith('.jpg'));
+                    const jpgUrl = jpgFile ? `https://raw.githubusercontent.com/BasirParvizi/F/main/${jpgFile.name}` : null;
+
+                    return { confUrl, jpgUrl };
+                } catch (error) {
+                    console.error('Error fetching repository files:', error);
+                    showToast('Failed to load files!');
+                    return { confUrl: null, jpgUrl: null };
+                }
+            }
+
+            // تنظیم لینک‌ها به صورت دینامیک
+            async function setupDynamicLinks() {
+                const { confUrl, jpgUrl } = await fetchRepositoryFiles();
+
+                // تنظیم لینک دانلود کانفیگ
+                if (confUrl) {
+                    document.getElementById('download-config').addEventListener('click', function(e) {
+                        e.preventDefault();
+                        showToast('Downloading Config...');
+                        forceDownloadWithOriginalName(confUrl);
+                    });
+                } else {
+                    document.getElementById('download-config').addEventListener('click', function(e) {
+                        e.preventDefault();
+                        showToast('No .conf file found!');
+                    });
+                }
+
+                // تنظیم لینک QR Code
+                if (jpgUrl) {
+                    document.getElementById('qr-code').href = jpgUrl;
+                } else {
+                    document.getElementById('qr-code').addEventListener('click', function(e) {
+                        e.preventDefault();
+                        showToast('No .jpg file found!');
+                    });
+                }
+            }
+
+            // دانلود APK 2
             document.getElementById('apk-download-2').addEventListener('click', function(e) {
                 e.preventDefault();
                 showToast('Downloading APK 2...');
                 forceDownloadWithOriginalName(
-                    'https://raw.githubusercontent.com/BasirParvizi/files/main/wireguard.apk'
+                    'https://raw.githubusercontent.com/BasirParvizi/F/main/wireguard.apk.png'
                 );
             });
 
-            // دانلود کانفیگ با نام اصلی
-            document.getElementById('download-config').addEventListener('click', function(e) {
-                e.preventDefault();
-                showToast('Downloading Config...');
-                forceDownloadWithOriginalName(
-                    'https://raw.githubusercontent.com/BasirParvizi/files/main/Tunnel-C400-158.conf'
-                );
-            });
+            // اجرای تنظیمات دینامیک
+            setupDynamicLinks();
         });
     </script>
 </body>
