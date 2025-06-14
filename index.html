@@ -3,9 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#e74c3c">
     <title>WireGuard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+
+
+
+
+
+
+
+
+
+
+        const config = "WireGuard-Config.conf";
+        const qr = "asdfghjk,.jpg";
+
+
+
+
+
+
+
+
+
+    </script>
     <style>
         :root {
             --primary-color: #e74c3c;
@@ -207,7 +229,7 @@
     <div class="container">
         <div class="logo-container">
             <img 
-                src="./logo.jpg" 
+                src="https://raw.githubusercontent.com/BasirParvizi/F/main/logo.jpg" 
                 alt="WireGuard Logo" 
                 class="logo" 
                 id="wireguard-logo"
@@ -245,7 +267,7 @@
                 <i class="fas fa-file-download"></i>
                 Download Config
             </a>
-            <a href="#" class="action-btn" id="qr-code">
+            <a href="https://raw.githubusercontent.com/BasirParvizi/WG/main/${qr}" class="action-btn" id="qr-code">
                 <i class="fas fa-qrcode"></i>
                 QR Code
             </a>
@@ -285,12 +307,7 @@
                     }),
                     mode: 'cors'
                 })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.blob();
-                })
+                .then(response => response.blob())
                 .then(blob => {
                     const blobUrl = window.URL.createObjectURL(blob);
                     const a = document.createElement('a');
@@ -303,77 +320,30 @@
                 })
                 .catch(e => {
                     console.error('Download error:', e);
-                    showToast('Download failed: ' + e.message);
+                    showToast('Download failed!');
                 });
             }
 
-            // تنظیم لینک‌ها به صورت دینامیک با مسیرهای نسبی
-            async function setupDynamicLinks() {
-                // فرض می‌کنیم فایل‌ها در همان دایرکتوری هستند
-                // برای شناسایی پویا، باید نام فایل‌ها را به صورت دستی یا از سرور بگیریم
-                // اینجا از نام‌های پیش‌فرض استفاده می‌کنیم
-                let confUrl = null;
-                let jpgUrl = null;
-
-                // تلاش برای پیدا کردن فایل .conf با درخواست آزمایشی
-                try {
-                    // فرض می‌کنیم فایل .conf وجود دارد
-                    const confResponse = await fetch('./config.conf'); // نام پیش‌فرض
-                    if (confResponse.ok) {
-                        confUrl = './config.conf';
-                    }
-                } catch (e) {
-                    console.log('No default config.conf found, trying to find any .conf file...');
-                }
-
-                // تلاش برای پیدا کردن فایل .jpg با درخواست آزمایشی
-                try {
-                    const jpgResponse = await fetch('./qrcode.jpg'); // نام پیش‌فرض
-                    if (jpgResponse.ok) {
-                        jpgUrl = './qrcode.jpg';
-                    }
-                } catch (e) {
-                    console.log('No default qrcode.jpg found, trying to find any .jpg file...');
-                }
-
-                // تنظیم لینک دانلود کانفیگ
-                if (confUrl) {
-                    console.log('Config file found:', confUrl);
-                    document.getElementById('download-config').addEventListener('click', function(e) {
-                        e.preventDefault();
-                        showToast('Downloading Config...');
-                        forceDownloadWithOriginalName(confUrl);
-                    });
-                } else {
-                    console.log('No .conf file found in directory');
-                    document.getElementById('download-config').addEventListener('click', function(e) {
-                        e.preventDefault();
-                        showToast('No .conf file found in directory!');
-                    });
-                }
-
-                // تنظیم لینک QR Code
-                if (jpgUrl) {
-                    console.log('JPG file found:', jpgUrl);
-                    document.getElementById('qr-code').href = jpgUrl;
-                } else {
-                    console.log('No .jpg file found in directory');
-                    document.getElementById('qr-code').addEventListener('click', function(e) {
-                        e.preventDefault();
-                        showToast('No .jpg file found in directory!');
-                    });
-                }
-            }
-
-            // دانلود APK 2
+            // دانلود APK 2 با نام اصلی
             document.getElementById('apk-download-2').addEventListener('click', function(e) {
                 e.preventDefault();
                 showToast('Downloading APK 2...');
-                forceDownloadWithOriginalName('./wireguard.apk');
+                forceDownloadWithOriginalName(
+                    'https://raw.githubusercontent.com/BasirParvizi/F/main/wireguard.apk'
+                );
             });
 
-            // اجرای تنظیمات دینامیک
-            setupDynamicLinks();
+            // دانلود کانفیگ با نام اصلی
+            document.getElementById('download-config').addEventListener('click', function(e) {
+                e.preventDefault();
+                showToast('Downloading Config...');
+                forceDownloadWithOriginalName(
+                    `https://raw.githubusercontent.com/BasirParvizi/WG/main/${config}`
+                );
+            });
+
+            // تنظیم لینک QR Code با استفاده از متغیر qr
+            document.getElementById('qr-code').href = `https://raw.githubusercontent.com/BasirParvizi/WG/main/${qr}`;
         });
     </script>
 </body>
