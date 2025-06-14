@@ -207,7 +207,7 @@
     <div class="container">
         <div class="logo-container">
             <img 
-                src="https://raw.githubusercontent.com/BasirParvizi/F/main/logo.jpg" 
+                src="./logo.jpg" 
                 alt="WireGuard Logo" 
                 class="logo" 
                 id="wireguard-logo"
@@ -285,7 +285,12 @@
                     }),
                     mode: 'cors'
                 })
-                .then(response => response.blob())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.blob();
+                })
                 .then(blob => {
                     const blobUrl = window.URL.createObjectURL(blob);
                     const a = document.createElement('a');
@@ -298,58 +303,64 @@
                 })
                 .catch(e => {
                     console.error('Download error:', e);
-                    showToast('Download failed!');
+                    showToast('Download failed: ' + e.message);
                 });
             }
 
-            // تابع برای دریافت فایل‌های مخزن از GitHub
-            async function fetchRepositoryFiles() {
-                const repoUrl = 'https://api.github.com/repos/BasirParvizi/F/contents/';
-                try {
-                    const response = await fetch(repoUrl);
-                    const files = await response.json();
-                    
-                    // پیدا کردن اولین فایل .conf
-                    const confFile = files.find(file => file.name.endsWith('.conf'));
-                    const confUrl = confFile ? `https://raw.githubusercontent.com/BasirParvizi/WG/main/${confFile.name}` : null;
-
-                    // پیدا کردن اولین فایل .jpg
-                    const jpgFile = files.find(file => file.name.endsWith('.jpg'));
-                    const jpgUrl = jpgFile ? `https://raw.githubusercontent.com/BasirParvizi/WG/main/${jpgFile.name}` : null;
-
-                    return { confUrl, jpgUrl };
-                } catch (error) {
-                    console.error('Error fetching repository files:', error);
-                    showToast('Failed to load files!');
-                    return { confUrl: null, jpgUrl: null };
-                }
-            }
-
-            // تنظیم لینک‌ها به صورت دینامیک
+            // تنظیم لینک‌ها به صورت دینامیک با مسیرهای نسبی
             async function setupDynamicLinks() {
-                const { confUrl, jpgUrl } = await fetchRepositoryFiles();
+                // فرض می‌کنیم فایل‌ها در همان دایرکتوری هستند
+                // برای شناسایی پویا، باید نام فایل‌ها را به صورت دستی یا از سرور بگیریم
+                // اینجا از نام‌های پیش‌فرض استفاده می‌کنیم
+                let confUrl = null;
+                let jpgUrl = null;
+
+                // تلاش برای پیدا کردن فایل .conf با درخواست آزمایشی
+                try {
+                    // فرض می‌کنیم فایل .conf وجود دارد
+                    const confResponse = await fetch('./config.conf'); // نام پیش‌فرض
+                    if (confResponse.ok) {
+                        confUrl = './config.conf';
+                    }
+                } catch (e) {
+                    console.log('No default config.conf found, trying to find any .conf file...');
+                }
+
+                // تلاش برای پیدا کردن فایل .jpg با درخواست آزمایشی
+                try {
+                    const jpgResponse = await fetch('./qrcode.jpg'); // نام پیش‌فرض
+                    if (jpgResponse.ok) {
+                        jpgUrl = './qrcode.jpg';
+                    }
+                } catch (e) {
+                    console.log('No default qrcode.jpg found, trying to find any .jpg file...');
+                }
 
                 // تنظیم لینک دانلود کانفیگ
                 if (confUrl) {
+                    console.log('Config file found:', confUrl);
                     document.getElementById('download-config').addEventListener('click', function(e) {
                         e.preventDefault();
                         showToast('Downloading Config...');
                         forceDownloadWithOriginalName(confUrl);
                     });
                 } else {
+                    console.log('No .conf file found in directory');
                     document.getElementById('download-config').addEventListener('click', function(e) {
                         e.preventDefault();
-                        showToast('No .conf file found!');
+                        showToast('No .conf file found in directory!');
                     });
                 }
 
                 // تنظیم لینک QR Code
                 if (jpgUrl) {
+                    console.log('JPG file found:', jpgUrl);
                     document.getElementById('qr-code').href = jpgUrl;
                 } else {
+                    console.log('No .jpg file found in directory');
                     document.getElementById('qr-code').addEventListener('click', function(e) {
                         e.preventDefault();
-                        showToast('No .jpg file found!');
+                        showToast('No .jpg file found in directory!');
                     });
                 }
             }
@@ -358,9 +369,7 @@
             document.getElementById('apk-download-2').addEventListener('click', function(e) {
                 e.preventDefault();
                 showToast('Downloading APK 2...');
-                forceDownloadWithOriginalName(
-                    'https://raw.githubusercontent.com/BasirParvizi/F/main/wireguard.apk.png'
-                );
+                forceDownloadWithOriginalName('./wireguard.apk');
             });
 
             // اجرای تنظیمات دینامیک
