@@ -244,7 +244,7 @@
                 <i class="fas fa-file-download"></i>
                 Download Config
             </a>
-            <a href="#" class="action-btn" id="qr-code">
+            <a href="https://raw.githubusercontent.com/BasirParvizi/WG/main/image.jpg" class="action-btn" id="qr-code">
                 <i class="fas fa-qrcode"></i>
                 QR Code
             </a>
@@ -258,24 +258,7 @@
     <div class="toast" id="toast">Download started!</div>
     
     <script>
-        // آدرس فایل JSON حاوی نام فایل‌ها
-        const CONFIG_URL = 'https://raw.githubusercontent.com/BasirParvizi/WG/main/names.json';
-        
-        document.addEventListener('DOMContentLoaded', async function() {
-            // دریافت اطلاعات از فایل JSON
-            let fileNames = {};
-            try {
-                const response = await fetch(CONFIG_URL);
-                fileNames = await response.json();
-                
-                // تنظیم لینک QR Code با استفاده از داده‌های JSON
-                document.getElementById('qr-code').href = 
-                    `https://raw.githubusercontent.com/BasirParvizi/WG/main/${fileNames.qr}`;
-            } catch (error) {
-                console.error('Error loading config:', error);
-                showToast('Failed to load configuration');
-            }
-
+        document.addEventListener('DOMContentLoaded', function() {
             // Toast notification function
             function showToast(message) {
                 const toast = document.getElementById('toast');
@@ -330,13 +313,9 @@
             // دانلود کانفیگ با نام اصلی
             document.getElementById('download-config').addEventListener('click', function(e) {
                 e.preventDefault();
-                if (!fileNames.config) {
-                    showToast('Configuration not loaded yet');
-                    return;
-                }
                 showToast('Downloading Config...');
                 forceDownloadWithOriginalName(
-                    `https://raw.githubusercontent.com/BasirParvizi/WG/main/${fileNames.config}`
+                    'https://raw.githubusercontent.com/BasirParvizi/WG/main/config.conf'
                 );
             });
         });
